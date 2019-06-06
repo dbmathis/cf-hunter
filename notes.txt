@@ -1,2 +1,5 @@
+# What should the report look like?
+https://docs.google.com/spreadsheets/d/1xNRSD7vGxP2wJdsoQXd0VxiVy51p4n7FikuC2uJBIKY/edit#gid=0 
+
 # Get org guid from name
 cf curl /v3/organizations/ | jq ' .resources[] | select(.name == "dmathis") | .guid'
