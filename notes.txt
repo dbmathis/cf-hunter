@@ -1,0 +1,2 @@
+# Get org guid from name
+cf curl /v3/organizations/ | jq ' .resources[] | select(.name == "dmathis") | .guid'
