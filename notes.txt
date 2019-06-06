@@ -3,3 +3,24 @@ https://docs.google.com/spreadsheets/d/1xNRSD7vGxP2wJdsoQXd0VxiVy51p4n7FikuC2uJB
 
 # Get org guid from name
 cf curl /v3/organizations/ | jq ' .resources[] | select(.name == "dmathis") | .guid'
+
+# Get spaces from org
+cf curl "/v3/spaces?organization_guids=0c2c4234-c66a-440a-8d54-1afffe9e1b18" | jq ' .resources[].guid'
+
+# Get apps from space
+cf curl "/v3/apps?space_guids=faba5722-9f46-4af1-9b63-083361f9238b" | jq ' .resources[].guid'
+
+# Get tasks from app
+cf curl "/v3/apps/0387c3c5-52fc-42e9-a00f-0f9e4d5e082d/tasks" | jq ' .resources[].guid'
+
+# Get tasks mem in mb from app
+cf curl "/v3/apps/0387c3c5-52fc-42e9-a00f-0f9e4d5e082d/tasks" | jq ' .resources[].memory_in_mb'
+
+# Get tasks mem in mb from org
+cf curl "/v3/tasks?organization_guids=0c2c4234-c66a-440a-8d54-1afffe9e1b18" | jq ' .resources[].memory_in_mb'
+
+# Get tasks mem in mb from space 
+cf curl "/v3/tasks?space_guids=faba5722-9f46-4af1-9b63-083361f9238b" | jq ' .resources[].memory_in_mb'
+
+# Get tasks mem in mb from task
+cf curl "/v3/tasks/14f3c0eb-4174-4c3c-a83c-d9fa57f4578d" | jq ' .memory_in_mb'
