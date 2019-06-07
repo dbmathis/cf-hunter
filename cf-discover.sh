@@ -12,4 +12,10 @@ function load_all_pages {
     echo "$DATA" | jq .[] | jq -s
 }
 
-load_all_pages "/v3/tasks?states=RUNNING&organization_guids=0c2c4234-c66a-440a-8d54-1afffe9e1b18" 
+# load_all_pages "/v3/tasks?states=RUNNING&organization_guids=0c2c4234-c66a-440a-8d54-1afffe9e1b18" 
+
+ORG_GUID=$(load_all_pages "/v3/organizations/" | jq -r ' .[] | select(.name == "dmathis") | .guid')
+
+load_all_pages "/v3/spaces?organization_guids=${ORG_GUID}" | jq -r ' .[].guid' | while read -r line ; do
+	echo "This is a guid $line";
+done
