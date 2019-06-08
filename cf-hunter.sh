@@ -12,17 +12,25 @@ function load_all_pages {
     echo "$data" | jq .[] | jq -s
 }
 
-org_guid=$(load_all_pages "/v3/organizations/" | jq -r ' .[] | select(.name == "dmathis") | .guid')
-
-org_tasks_total_mem=$(load_all_pages "/v3/tasks?organization_guids=${org_guid}" | jq -r ' .[].memory_in_mb' | awk '{s+=$1} END {printf "%.0f", s}')
-org_processes_total_mem=$(load_all_pages "/v3/processes?organization_guids=${org_guid}" | jq -r ' .[].memory_in_mb' | awk '{s+=$1} END {printf "%.0f", s}')
-org_total_mem=$(($org_tasks_total_mem+$org_processes_total_mem))
-org_tasks_total_disk=$(load_all_pages "/v3/tasks?organization_guids=${org_guid}" | jq -r ' .[].disk_in_mb' | awk '{s+=$1} END {printf "%.0f", s}')
-org_processes_total_disk=$(load_all_pages "/v3/processes?organization_guids=${org_guid}" | jq -r ' .[].disk_in_mb' | awk '{s+=$1} END {printf "%.0f", s}')
-org_total_disk=$(($org_tasks_total_disk+$org_processes_total_disk))
-
 div1="printf '%80s\n' | tr ' ' ="
 div2="printf '%80s\n' | tr ' ' -"
+
+jq_mem_select=' .[].memory_in_mb'
+jq_disk_select=' .[].disk_in_mb'
+jq_org_guid_select=' .[] | select(.name == "dmathis") | .guid'
+awk_sum='{s+=$1} END {printf "%.0f", s}'
+
+org_guid=$(load_all_pages "/v3/organizations/" | jq -r "$jq_org_guid_select")
+
+org_tasks=$(load_all_pages "/v3/tasks?organization_guids=${org_guid}")
+org_processes=$(load_all_pages "/v3/processes?organization_guids=${org_guid}")
+
+org_tasks_total_mem=$(echo $org_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
+org_processes_total_mem=$(echo $org_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
+org_total_mem=$(($org_tasks_total_mem+$org_processes_total_mem))
+org_tasks_total_disk=$(echo $org_tasks | jq -r "$jq_disk_select" | awk "$awk_sum")
+org_processes_total_disk=$(echo $org_processes | jq -r "$jq_disk_select" | awk "$awk_sum")
+org_total_disk=$(($org_tasks_total_disk+$org_processes_total_disk))
 
 printf "%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory" 
 eval "$div1"
