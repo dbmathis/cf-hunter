@@ -1,4 +1,82 @@
 #!/bin/bash
+# Discover tasks or processes in an org that are discreetly using memory / disk space.
+
+die() {
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+# Initialize all the option variables.
+# This ensures we are not contaminated by variables from the environment.
+org=
+space=
+verbose=0
+
+# Define usage
+function usage {
+    cat <<EOM
+Usage: 
+  $(basename "$0") -o <org> [-s <space>]
+      
+  -o|--org       <text> cf org 
+  -s|--space     <text> cf space 
+  -h|--help                   
+Examples:
+  $ $(basename "$0") -o system -s autoscaling 
+EOM
+    exit 2
+}
+
+# Process options
+while :; do
+    case $1 in
+        -\?|--help)
+            usage               # Display a usage synopsis.
+            exit
+            ;;
+        -o|--org)               # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                org=$2
+                shift
+            else
+                die 'ERROR: "--org" requires a non-empty option argument.'
+            fi
+            ;;
+        --org=?*)
+            org=${1#*=}         # Delete everything up to "=" and assign the remainder.
+            ;;
+        --org=)                 # Handle the case of an empty --org=
+            die 'ERROR: "--org" requires a non-empty option argument.'
+            ;;
+        -s|--space)             # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                space_filter=$2
+                shift
+            fi
+            ;;
+        --space=?*)
+            space_filter=${1#*=}       # Delete everything up to "=" and assign the remainder.
+            ;;
+       -v|--verbose)
+            verbose=$((verbose + 1))  # Each -v adds 1 to verbosity.
+            ;;
+        --)                      # End of all options.
+            shift
+            break
+            ;;
+        -?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)                       # Default case: No more options, so break out of the loop.
+            break
+    esac
+
+    shift
+done
+
+if [ -z $org ]; then
+   usage
+fi
 
 function load_all_pages {
     url="$1"
@@ -15,8 +93,6 @@ function load_all_pages {
 div1="printf '%80s\n' | tr ' ' ="
 div2="printf '%80s\n' | tr ' ' -"
 
-org='system'
-space_filter=''
 jq_mem_select=' .[].memory_in_mb'
 jq_disk_select=' .[].disk_in_mb'
 jq_org_guid_select=" .[] | select(.name == \"${org}\") | .guid"
@@ -83,4 +159,3 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
    fi  
 done
 
-echo "$output"
