@@ -21,7 +21,7 @@ $ chmod +x cf-hunter.sh
 
 ## Target CF.
 ```
-$ cf login -a api.run-11.haas-59.pez.pivotal.io```
+$ cf login -a api.<system domain>
 ```
   
 ## Usage
@@ -69,8 +69,6 @@ Org: dmathis                                              9216 MB        4539 MB
                Process: web                               1024 MB        3072 MB
 ================================================================================
      Space: myspace                                          0 MB           0 MB
-================================================================================
-     Space: invasionofspace                                  0 MB           0 MB
 ```
 
 ## Maintainer
