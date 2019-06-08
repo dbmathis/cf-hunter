@@ -12,7 +12,7 @@ Discover tasks or processes in an org that are discreetly using memory / disk sp
 https://stedolan.github.io/jq/download
 
 
-### Install updater
+### Install hunter
 ```
 $ git clone https://github.com/dbmathis/cf-hunter.git
 $ cd cf-hunter
