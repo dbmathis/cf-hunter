@@ -15,9 +15,11 @@ function load_all_pages {
 div1="printf '%80s\n' | tr ' ' ="
 div2="printf '%80s\n' | tr ' ' -"
 
+org='system'
+space_filter=''
 jq_mem_select=' .[].memory_in_mb'
 jq_disk_select=' .[].disk_in_mb'
-jq_org_guid_select=' .[] | select(.name == "dmathis") | .guid'
+jq_org_guid_select=" .[] | select(.name == \"${org}\") | .guid"
 awk_sum='{s+=$1} END {printf "%.0f", s}'
 
 org_guid=$(load_all_pages "/v3/organizations/" | jq -r "$jq_org_guid_select")
@@ -32,14 +34,18 @@ org_tasks_total_disk=$(echo $org_tasks | jq -r "$jq_disk_select" | awk "$awk_sum
 org_processes_total_disk=$(echo $org_processes | jq -r "$jq_disk_select" | awk "$awk_sum")
 org_total_disk=$(($org_tasks_total_disk+$org_processes_total_disk))
 
-printf "%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory" 
-eval "$div1"
-printf "%-50s%15s%15s\n" "Org: dmathis" "$org_total_disk MB" "$org_total_mem MB"
+printf "%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory"
+
+if [ -z "$space_filter" ]; then
+   eval "$div1"
+   printf "%-50s%15s%15s\n" "Org: $org" "$org_total_disk MB" "$org_total_mem MB"
+fi
 
 for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -r ' .[].guid'); do
+   space_name=$(cf curl "/v3/spaces/${space}" | jq -r .name)
+   if [ -z "$space_filter" ] || [ "$space_name" = "$space_filter" ]; then
    space_tasks=$(load_all_pages "/v3/tasks?space_guids=${space}")
    space_processes=$(load_all_pages "/v3/processes?space_guids=${space}")
-   space_name=$(cf curl "/v3/spaces/${space}" | jq -r .name)
    space_tasks_total_mem=$(echo $space_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
    space_processes_total_mem=$(echo $space_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
    space_total_mem=$(($space_tasks_total_mem+$space_processes_total_mem))
@@ -73,7 +79,8 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
          process_disk=$(cf curl "/v3/processes/${process}" | jq -r .disk_in_mb)
          printf "%-15s%-35s%15s%15s\n" "" "Process: $process_name" "$process_disk MB" "$process_mem MB"
       done
-   done  
+   done
+   fi  
 done
 
 echo "$output"
