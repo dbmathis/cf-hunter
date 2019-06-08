@@ -44,42 +44,42 @@ fi
 for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -r ' .[].guid'); do
    space_name=$(cf curl "/v3/spaces/${space}" | jq -r .name)
    if [ -z "$space_filter" ] || [ "$space_name" = "$space_filter" ]; then
-   space_tasks=$(load_all_pages "/v3/tasks?space_guids=${space}")
-   space_processes=$(load_all_pages "/v3/processes?space_guids=${space}")
-   space_tasks_total_mem=$(echo $space_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
-   space_processes_total_mem=$(echo $space_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
-   space_total_mem=$(($space_tasks_total_mem+$space_processes_total_mem))
-   space_tasks_total_disk=$(echo $space_tasks | jq -r "$jq_disk_select" | awk "$awk_sum")
-   space_processes_total_disk=$(echo $space_processes | jq -r "$jq_disk_select" | awk "$awk_sum")
-   space_total_disk=$(($space_tasks_total_disk+$space_processes_total_disk))
-   eval "$div1"
-   printf "%-5s%-45s%15s%15s\n" "" "Space: $space_name" "$space_total_disk MB" "$space_total_mem MB"
-   for app in $(load_all_pages "/v3/apps?space_guids=${space}" | jq -r ' .[].guid'); do
-      app_tasks=$(load_all_pages "/v3/tasks?app_guids=${app}")
-      app_processes=$(load_all_pages "/v3/processes?app_guids=${app}")
-      app_name=$(cf curl "/v3/apps/${app}" | jq -r .name)
-      app_tasks_total_mem=$(echo $app_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
-      app_processes_total_mem=$(echo $app_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
-      app_total_mem=$(($app_tasks_total_mem+$app_processes_total_mem))
-      app_tasks_total_disk=$(echo $app_tasks | jq -r "$jq_disk_select" | awk "$awk_sum")
-      app_processes_total_disk=$(echo $app_processes | jq -r "$jq_disk_select" | awk "$awk_sum")
-      app_total_disk=$(($app_tasks_total_disk+$app_processes_total_disk))
-      eval "$div2"      
-      printf "%-10s%-40s%15s%15s\n" "" "App: $app_name" "$app_total_disk MB" "$app_total_mem MB"
-      eval "$div2"
-      for task in $(load_all_pages "/v3/tasks?app_guids=${app}" | jq -r ' .[].guid'); do
-         task_name=$(cf curl "/v3/tasks/${task}" | jq -r .name)
-         task_mem=$(cf curl "/v3/tasks/${task}" | jq -r .memory_in_mb)
-         task_disk=$(cf curl "/v3/tasks/${task}" | jq -r .disk_in_mb)
-         printf "%-15s%-35s%15s%15s\n" "" "Task: $task_name" "$task_disk MB" "$task_mem MB"
+      space_tasks=$(load_all_pages "/v3/tasks?space_guids=${space}")
+      space_processes=$(load_all_pages "/v3/processes?space_guids=${space}")
+      space_tasks_total_mem=$(echo $space_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
+      space_processes_total_mem=$(echo $space_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
+      space_total_mem=$(($space_tasks_total_mem+$space_processes_total_mem))
+      space_tasks_total_disk=$(echo $space_tasks | jq -r "$jq_disk_select" | awk "$awk_sum")
+      space_processes_total_disk=$(echo $space_processes | jq -r "$jq_disk_select" | awk "$awk_sum")
+      space_total_disk=$(($space_tasks_total_disk+$space_processes_total_disk))
+      eval "$div1"
+      printf "%-5s%-45s%15s%15s\n" "" "Space: $space_name" "$space_total_disk MB" "$space_total_mem MB"
+      for app in $(load_all_pages "/v3/apps?space_guids=${space}" | jq -r ' .[].guid'); do
+         app_tasks=$(load_all_pages "/v3/tasks?app_guids=${app}")
+         app_processes=$(load_all_pages "/v3/processes?app_guids=${app}")
+         app_name=$(cf curl "/v3/apps/${app}" | jq -r .name)
+         app_tasks_total_mem=$(echo $app_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
+         app_processes_total_mem=$(echo $app_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
+         app_total_mem=$(($app_tasks_total_mem+$app_processes_total_mem))
+         app_tasks_total_disk=$(echo $app_tasks | jq -r "$jq_disk_select" | awk "$awk_sum")
+         app_processes_total_disk=$(echo $app_processes | jq -r "$jq_disk_select" | awk "$awk_sum")
+         app_total_disk=$(($app_tasks_total_disk+$app_processes_total_disk))
+         eval "$div2"      
+         printf "%-10s%-40s%15s%15s\n" "" "App: $app_name" "$app_total_disk MB" "$app_total_mem MB"
+         eval "$div2"
+         for task in $(load_all_pages "/v3/tasks?app_guids=${app}" | jq -r ' .[].guid'); do
+            task_name=$(cf curl "/v3/tasks/${task}" | jq -r .name)
+            task_mem=$(cf curl "/v3/tasks/${task}" | jq -r .memory_in_mb)
+            task_disk=$(cf curl "/v3/tasks/${task}" | jq -r .disk_in_mb)
+            printf "%-15s%-35s%15s%15s\n" "" "Task: $task_name" "$task_disk MB" "$task_mem MB"
+         done
+         for process in $(load_all_pages "/v3/processes?app_guids=${app}" | jq -r ' .[].guid'); do
+            process_name=$(cf curl "/v3/processes/${process}" | jq -r .type)
+            process_mem=$(cf curl "/v3/processes/${process}" | jq -r .memory_in_mb)
+            process_disk=$(cf curl "/v3/processes/${process}" | jq -r .disk_in_mb)
+            printf "%-15s%-35s%15s%15s\n" "" "Process: $process_name" "$process_disk MB" "$process_mem MB"
+         done
       done
-      for process in $(load_all_pages "/v3/processes?app_guids=${app}" | jq -r ' .[].guid'); do
-         process_name=$(cf curl "/v3/processes/${process}" | jq -r .type)
-         process_mem=$(cf curl "/v3/processes/${process}" | jq -r .memory_in_mb)
-         process_disk=$(cf curl "/v3/processes/${process}" | jq -r .disk_in_mb)
-         printf "%-15s%-35s%15s%15s\n" "" "Process: $process_name" "$process_disk MB" "$process_mem MB"
-      done
-   done
    fi  
 done
 
