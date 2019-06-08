@@ -1,5 +1,5 @@
 
-# Clould Foundry Hunter
+# CF Hunter
 
 Discover tasks or processes in an org that are discreetly using memory / disk space.
 
