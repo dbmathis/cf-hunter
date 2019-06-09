@@ -79,6 +79,8 @@ if [ -z $org ]; then
    usage
 fi
 
+echo -e "Please be patient while the report generates. This may take a while..."
+
 output=$(
 
 # Page through api call results
@@ -120,7 +122,7 @@ org_processes_total_disk=$(echo $org_processes | jq -r "$jq_disk_select" | awk "
 org_total_disk=$(($org_tasks_total_disk+$org_processes_total_disk))
 
 # Print org info
-printf "%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory"
+printf "\n%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory"
 
 if [ -z "$space_filter" ]; then
    eval "$div1";
