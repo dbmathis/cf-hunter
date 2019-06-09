@@ -38,6 +38,7 @@ Examples:
 
 
 ## Examples
+Run for entire org
 ```
 MacBook-Pro-3 cf-hunter$ ./cf-hunter.sh -o dmathis
 Hierarchy                                                    Disk         Memory
@@ -71,7 +72,7 @@ Org: dmathis                                              9216 MB        4539 MB
 ================================================================================
      Space: myspace                                          0 MB           0 MB
 ```
-Or
+Run for a specific space in and org
 ```
 MacBook-Pro-3 cf-hunter$ ./cf-hunter.sh -o dmathis --space outerspace
 Hierarchy                                                    Disk         Memory
