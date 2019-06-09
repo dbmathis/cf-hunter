@@ -1,6 +1,6 @@
 #!/bin/bash
-# Discover tasks or processes in an org that are discreetly using memory / disk space.
-
+# Hunt down tasks and processes in an org that are discreetly using memory / disk space.
+# It's not possible see the memory or disk that a task is using from the UI, so this is helpful.
 die() {
     printf '%s\n' "$1" >&2
     exit 1
@@ -18,8 +18,8 @@ function usage {
 Usage: 
   $(basename "$0") -o <org> [-s <space>]
       
-  -o|--org       <text> cf org 
-  -s|--space     <text> cf space 
+  -o|--org       <text> a single cf org 
+  -s|--space     <text> a single cf space 
   -h|--help                   
 Examples:
   $ $(basename "$0") -o system -s autoscaling 
@@ -124,6 +124,8 @@ if [ -z "$space_filter" ]; then
    eval "$div1"
    printf "%-50s%15s%15s\n" "Org: $org" "$org_total_disk MB" "$org_total_mem MB"
 fi
+
+echo -e $output
 
 # Loop through spaces for specified org
 for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -r ' .[].guid'); do
