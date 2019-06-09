@@ -37,7 +37,7 @@ Examples:
 
 
 ## Examples
-Run for entire org
+Run for an entire org.
 ```
 MacBook-Pro-3 cf-hunter$ ./cf-hunter.sh -o dmathis
 Hierarchy                                                    Disk         Memory
@@ -71,7 +71,7 @@ Org: dmathis                                              9216 MB        4539 MB
 ================================================================================
      Space: myspace                                          0 MB           0 MB
 ```
-Run for a specific space in and org
+Run for a specific space in an org.
 ```
 MacBook-Pro-3 cf-hunter$ ./cf-hunter.sh -o dmathis --space outerspace
 Hierarchy                                                    Disk         Memory
@@ -95,3 +95,8 @@ Hierarchy                                                    Disk         Memory
 ## Support
 
 This is a community supported cloud foundry tool. Opening issues for questions, feature requests and/or bugs is the best path to getting "support".
+
+
+## Known Issues
+
+Need to add isolation segment support.
