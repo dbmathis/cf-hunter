@@ -1,6 +1,6 @@
 
 # CF Hunter
-Hunts down tasks and processes in an org that are discreetly using memory / disk space. Seeing what tasks are running and how much memory and disk space they are using is not easy from the UI or API.
+Hunts down tasks and processes in an org that are discreetly using memory / disk space because seeing what tasks are running and how much memory and disk space they are using is not easy from the UI or API.
 
 
 ## Installation
