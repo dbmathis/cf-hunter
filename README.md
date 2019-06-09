@@ -10,7 +10,6 @@ Hunt down tasks and processes in an org that are discreetly using memory / disk 
 
 #### jq: https://stedolan.github.io/jq/download
 
-
 ### Install hunter
 ```
 $ git clone https://github.com/dbmathis/cf-hunter.git
@@ -18,7 +17,8 @@ $ cd cf-hunter
 $ chmod +x cf-hunter.sh
 ```
 
-## Target CF.
+
+## Login to CF
 ```
 $ cf login -a api.<system domain>
 ```
