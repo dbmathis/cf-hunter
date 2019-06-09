@@ -79,6 +79,8 @@ if [ -z $org ]; then
    usage
 fi
 
+output=$(
+
 # Page through api call results
 function load_all_pages {
     url="$1"
@@ -121,11 +123,9 @@ org_total_disk=$(($org_tasks_total_disk+$org_processes_total_disk))
 printf "%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory"
 
 if [ -z "$space_filter" ]; then
-   eval "$div1"
-   printf "%-50s%15s%15s\n" "Org: $org" "$org_total_disk MB" "$org_total_mem MB"
+   eval "$div1";
+   printf "%-50s%15s%15s\n" "Org: $org" "$org_total_disk MB" "$org_total_mem MB"; 
 fi
-
-echo -e $output
 
 # Loop through spaces for specified org
 for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -r ' .[].guid'); do
@@ -195,3 +195,6 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
    fi  
 done
 
+)
+
+echo "$output"
