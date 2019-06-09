@@ -1,15 +1,14 @@
 
 # CF Hunter
 
-Discover tasks or processes in an org that are discreetly using memory / disk space.
+Hunt down tasks and processes in an org that are discreetly using memory / disk space.
 
 
 ## Installation
 
 ### Install dependency jq.
 
-#### jq:
-https://stedolan.github.io/jq/download
+#### jq: https://stedolan.github.io/jq/download
 
 
 ### Install hunter
