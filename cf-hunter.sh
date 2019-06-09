@@ -174,8 +174,8 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
          for task in $(load_all_pages "/v3/tasks?app_guids=${app}" | jq -r ' .[].guid'); do
             # Do task queries and calculations
             task_name=$(cf curl "/v3/tasks/${task}" | jq -r .name)
-            task_mem=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_mem_select")
-            task_disk=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_disk_select")
+            task_mem=$(cf curl "/v3/tasks/${task}" | jq -r .memory_in_mb)
+            task_disk=$(cf curl "/v3/tasks/${task}" | jq -r .disk_in_mb)
             
             # Print task info
             printf "%-15s%-35s%15s%15s\n" "" "Task: $task_name" "$task_disk MB" "$task_mem MB"
@@ -185,8 +185,8 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
          for process in $(load_all_pages "/v3/processes?app_guids=${app}" | jq -r ' .[].guid'); do
             # Do process queries and calculations
             process_name=$(cf curl "/v3/processes/${process}" | jq -r .type)
-            process_mem=$(cf curl "/v3/processes/${process}" | jq -r "$jq_mem_select")
-            process_disk=$(cf curl "/v3/processes/${process}" | jq -r "$jq_disk_select")
+            process_mem=$(cf curl "/v3/processes/${process}" | jq -r .memory_in_mb)
+            process_disk=$(cf curl "/v3/processes/${process}" | jq -r .disk_in_mb)
             
             # Print process info
             printf "%-15s%-35s%15s%15s\n" "" "Process: $process_name" "$process_disk MB" "$process_mem MB"

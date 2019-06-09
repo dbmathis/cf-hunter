@@ -23,6 +23,7 @@ $ chmod +x cf-hunter.sh
 $ cf login -a api.<system domain>
 ```
   
+
 ## Usage
 ```
 Usage:
@@ -35,7 +36,8 @@ Examples:
   $ cf-hunter.sh -o system -s autoscaling
 ```
 
-## Example
+
+## Examples
 ```
 MacBook-Pro-3 cf-hunter$ ./cf-hunter.sh -o dmathis
 Hierarchy                                                    Disk         Memory
@@ -69,6 +71,21 @@ Org: dmathis                                              9216 MB        4539 MB
 ================================================================================
      Space: myspace                                          0 MB           0 MB
 ```
+Or
+```
+MacBook-Pro-3 cf-hunter$ ./cf-hunter.sh -o dmathis --space outerspace
+Hierarchy                                                    Disk         Memory
+================================================================================
+     Space: outerspace                                    4096 MB        3387 MB
+--------------------------------------------------------------------------------
+          App: redis-example-app-2                        4096 MB        3387 MB
+--------------------------------------------------------------------------------
+               Task: 56554a31                             1024 MB         150 MB
+               Task: dcc22b5d                             1024 MB         150 MB
+               Task: 70184abc                             1024 MB          15 MB
+               Process: web                               1024 MB        3072 MB
+```
+
 
 ## Maintainer
 
