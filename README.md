@@ -1,7 +1,6 @@
 
 # CF Hunter
-
-Hunt down tasks and processes in an org that are discreetly using memory / disk space.
+Hunts down tasks and processes in an org that are discreetly using memory / disk space. Seeing what tasks are running and how much memory and disk space they are using is not easy from the UI or API.
 
 
 ## Installation
@@ -18,7 +17,7 @@ $ chmod +x cf-hunter.sh
 ```
 
 
-## Login to CF
+## Login
 ```
 $ cf login -a api.<system domain>
 ```
