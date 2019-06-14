@@ -175,7 +175,7 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
 
          # Print app info
          eval "$div2"      
-         printf "%-10s%-44s%13s%13s\n" "" "App: $(echo $app_name | cut -c 1-34) ($(echo $app_state | awk {'print tolower($0)'}))" "$app_total_disk MB" "$app_total_mem MB"
+         printf "%-10s%-44s%13s%13s\n" "" "App: $(echo $app_name | cut -c 1-29) ($(echo $app_state | awk {'print tolower($0)'}))" "$app_total_disk MB" "$app_total_mem MB"
          eval "$div2" 
 
          # Loop through tasks for specified app
