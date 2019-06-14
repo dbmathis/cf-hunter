@@ -101,9 +101,14 @@ div1="printf '%80s\n' | tr ' ' ="
 div2="printf '%80s\n' | tr ' ' -"
 
 # Define jq and awk strings
-jq_mem_select=' .[].memory_in_mb'
-jq_disk_select=' .[].disk_in_mb'
-jq_org_guid_select=" .[] | select(.name == \"${org}\") | .guid"
+jq_mem_select='.[].memory_in_mb'
+jq_disk_select='.[].disk_in_mb'
+jq_org_guid_select=".[] | select(.name == \"${org}\") | .guid"
+jq_app_mem_select='.memory_in_mb'
+jq_app_disk_select='.disk_in_mb'
+jq_app_state_select='.state'
+jq_name_select='.name'
+jq_type_select='.type'
 awk_sum='{s+=$1} END {printf "%.0f", s}'
 
 # Get org guid
@@ -122,17 +127,17 @@ org_processes_total_disk=$(echo $org_processes | jq -r "$jq_disk_select" | awk "
 org_total_disk=$(($org_tasks_total_disk+$org_processes_total_disk))
 
 # Print org info
-printf "\n%-50s%15s%15s\n" "Hierarchy" "Disk" "Memory"
+printf "\n%-54s%13s%13s\n" "Hierarchy" "Disk" "Memory"
 
 if [ -z "$space_filter" ]; then
    eval "$div1";
-   printf "%-50s%15s%15s\n" "Org: $org" "$org_total_disk MB" "$org_total_mem MB"; 
+   printf "%-54s%13s%13s\n" "Org: $org" "$org_total_disk MB" "$org_total_mem MB"; 
 fi
 
 # Loop through spaces for specified org
 for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -r ' .[].guid'); do
    # Get space name
-   space_name=$(cf curl "/v3/spaces/${space}" | jq -r .name)
+   space_name=$(cf curl "/v3/spaces/${space}" | jq -r "$jq_name_select")
 
    # If no space filter interrogate all spaces, else just the space filter 
    if [ -z "$space_filter" ] || [ "$space_name" = "$space_filter" ]; then
@@ -150,7 +155,7 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
 
       # Print space info
       eval "$div1"
-      printf "%-5s%-45s%15s%15s\n" "" "Space: $space_name" "$space_total_disk MB" "$space_total_mem MB"
+      printf "%-5s%-49s%13s%13s\n" "" "Space: $space_name" "$space_total_disk MB" "$space_total_mem MB"
  
       # Loop through apps for specified space
       for app in $(load_all_pages "/v3/apps?space_guids=${space}" | jq -r ' .[].guid'); do
@@ -159,8 +164,9 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
          app_processes=$(load_all_pages "/v3/processes?app_guids=${app}")
 
          # Do app queries and calculations
-         app_name=$(cf curl "/v3/apps/${app}" | jq -r .name)
-         app_tasks_total_mem=$(echo $app_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
+         app_name=$(cf curl "/v3/apps/${app}" | jq -r "$jq_name_select")
+         app_state=$(cf curl "/v3/apps/${app}" | jq -r "$jq_app_state_select")
+	 app_tasks_total_mem=$(echo $app_tasks | jq -r "$jq_mem_select" | awk "$awk_sum")
          app_processes_total_mem=$(echo $app_processes | jq -r "$jq_mem_select" | awk "$awk_sum")
          app_total_mem=$(($app_tasks_total_mem+$app_processes_total_mem))
          app_tasks_total_disk=$(echo $app_tasks | jq -r "$jq_disk_select" | awk "$awk_sum")
@@ -169,29 +175,29 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
 
          # Print app info
          eval "$div2"      
-         printf "%-10s%-40s%15s%15s\n" "" "App: $app_name" "$app_total_disk MB" "$app_total_mem MB"
+         printf "%-10s%-44s%13s%13s\n" "" "App: $(echo $app_name | cut -c 1-34) ($(echo $app_state | awk {'print tolower($0)'}))" "$app_total_disk MB" "$app_total_mem MB"
          eval "$div2" 
 
          # Loop through tasks for specified app
          for task in $(load_all_pages "/v3/tasks?app_guids=${app}" | jq -r ' .[].guid'); do
             # Do task queries and calculations
-            task_name=$(cf curl "/v3/tasks/${task}" | jq -r .name)
-            task_mem=$(cf curl "/v3/tasks/${task}" | jq -r .memory_in_mb)
-            task_disk=$(cf curl "/v3/tasks/${task}" | jq -r .disk_in_mb)
+            task_name=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_name_select")
+            task_mem=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_app_mem_select")
+            task_disk=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_app_disk_select")
             
             # Print task info
-            printf "%-15s%-35s%15s%15s\n" "" "Task: $task_name" "$task_disk MB" "$task_mem MB"
+            printf "%-15s%-39s%13s%13s\n" "" "Task: $task_name" "$task_disk MB" "$task_mem MB"
          done
 
          # Loop through processes for specified app
          for process in $(load_all_pages "/v3/processes?app_guids=${app}" | jq -r ' .[].guid'); do
             # Do process queries and calculations
-            process_name=$(cf curl "/v3/processes/${process}" | jq -r .type)
-            process_mem=$(cf curl "/v3/processes/${process}" | jq -r .memory_in_mb)
-            process_disk=$(cf curl "/v3/processes/${process}" | jq -r .disk_in_mb)
+            process_name=$(cf curl "/v3/processes/${process}" | jq -r "$jq_type_select")
+            process_mem=$(cf curl "/v3/processes/${process}" | jq -r "$jq_app_mem_select")
+            process_disk=$(cf curl "/v3/processes/${process}" | jq -r "$jq_app_disk_select")
             
             # Print process info
-            printf "%-15s%-35s%15s%15s\n" "" "Process: $process_name" "$process_disk MB" "$process_mem MB"
+            printf "%-15s%-39s%13s%13s\n" "" "Process: $process_name" "$process_disk MB" "$process_mem MB"
          done
       done
    fi  
