@@ -115,7 +115,7 @@ awk_sum='{s+=$1} END {printf "%.0f", s}'
 org_guid=$(load_all_pages "/v3/organizations/" | jq -r "$jq_org_guid_select")
 
 # Get org tasks and processes
-org_tasks=$(load_all_pages "/v3/tasks?organization_guids=${org_guid}")
+org_tasks=$(load_all_pages "/v3/tasks?states=RUNNING&organization_guids=${org_guid}")
 org_processes=$(load_all_pages "/v3/processes?organization_guids=${org_guid}")
 
 # Do org queries and calculations
@@ -142,7 +142,7 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
    # If no space filter interrogate all spaces, else just the space filter 
    if [ -z "$space_filter" ] || [ "$space_name" = "$space_filter" ]; then
       # Get space tasks and processes
-      space_tasks=$(load_all_pages "/v3/tasks?space_guids=${space}")
+      space_tasks=$(load_all_pages "/v3/tasks?states=RUNNING&space_guids=${space}")
       space_processes=$(load_all_pages "/v3/processes?space_guids=${space}")
 
       # Do space queries and calculations
@@ -160,7 +160,7 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
       # Loop through apps for specified space
       for app in $(load_all_pages "/v3/apps?space_guids=${space}" | jq -r ' .[].guid'); do
          # Get app tasks and processes
-         app_tasks=$(load_all_pages "/v3/tasks?app_guids=${app}")
+         app_tasks=$(load_all_pages "/v3/tasks?states=RUNNING&app_guids=${app}")
          app_processes=$(load_all_pages "/v3/processes?app_guids=${app}")
 
          # Do app queries and calculations
@@ -179,7 +179,7 @@ for space in $(load_all_pages "/v3/spaces?organization_guids=${org_guid}" | jq -
          eval "$div2" 
 
          # Loop through tasks for specified app
-         for task in $(load_all_pages "/v3/tasks?app_guids=${app}" | jq -r ' .[].guid'); do
+         for task in $(load_all_pages "/v3/tasks?states=RUNNING&app_guids=${app}" | jq -r ' .[].guid'); do
             # Do task queries and calculations
             task_name=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_name_select")
             task_mem=$(cf curl "/v3/tasks/${task}" | jq -r "$jq_app_mem_select")
